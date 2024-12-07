@@ -24,7 +24,7 @@ app.register_blueprint(user, url_prefix="/user")
 def index():
     """Redirect to right page if logged in or not"""
     if current_user.is_authenticated:
-        return render_template("calendar.html")
+        return render_template("Calendar.html")
     return redirect(url_for("user.login"))
 
 
