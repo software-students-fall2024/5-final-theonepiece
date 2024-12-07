@@ -1,5 +1,5 @@
 from flask import Blueprint, request, redirect, url_for, flash, render_template
-from flask_login import LoginManager, login_user, logout_user, login_required
+from flask_login import LoginManager, login_user
 from user.models import User
 from pymongo import MongoClient
 
@@ -37,24 +37,19 @@ def login():
 @auth.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "POST":
-        username = request.form["username"]
+        email = request.form["email"]
         password = request.form["password"]
         firstname = request.form["firstname"]
         lastname = request.form["lastname"]
 
-        existing_user = User.find_by_username(db, username)
+        existing_user = User.find_by_email(db, email)
         if existing_user:
             flash("Username already exists", "danger")
         else:
-            User.create_user(db, username, password, firstname, lastname)
+            User.create_user(db, email, password, firstname, lastname)
             flash("Account created successfully! Please log in.", "success")
             return redirect(url_for("auth.login"))
     return render_template("Signup.html")
 
 
-@auth.route("/logout")
-@login_required
-def logout():
-    logout_user()
-    flash("Logged out successfully!", "success")
-    return redirect(url_for("auth.login"))
+

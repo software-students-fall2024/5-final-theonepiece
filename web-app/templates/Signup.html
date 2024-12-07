@@ -127,13 +127,6 @@
         <div class="app-logo">
             <span>FI&#36;CAL.</span>
         </div>
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <div class="flash-message">
-                    {{ messages[0] }} 
-                </div>
-            {% endif %}
-        {% endwith %}
 
         <!-- Sign-Up Form -->
         <form class="signup-form" action="{{url_for('user.signup') }}" method="POST">
@@ -152,10 +145,10 @@
                 required
             />
             <input
-                type="text"
+                type="email"
                 class="form-input"
-                placeholder="Username"
-                name="username"
+                placeholder="Email"
+                name="email"
                 required
             />
             <input

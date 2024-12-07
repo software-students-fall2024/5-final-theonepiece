@@ -142,13 +142,6 @@
         <!-- Login Form -->
         <form class="login-form" action="{{ url_for('user.login') }}" method="POST">
             <h3>Welcome!</h3>
-            {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                    <div class="flash-message">
-                        {{ messages[0] }} 
-                    </div>
-                {% endif %}
-            {% endwith %}
             <input
                 type="text"
                 class="form-input"

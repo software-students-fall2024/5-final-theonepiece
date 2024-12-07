@@ -127,10 +127,10 @@ DEFAULT_CATEGORIES = [
 def add_event():
     """POST request accept JSON payload to add event"""
     data = request.json
-    amount = data.get("Amount")
-    category = data.get("Category")
-    date = data.get("Date")
-    memo = data.get("Memo")
+    amount = data.get("amount")
+    category = data.get("category")
+    date = data.get("date")
+    memo = data.get("memo")
 
     event = {
         "_id": str(ObjectId()),
@@ -141,7 +141,7 @@ def add_event():
     }
 
     current_user.add_event(db, event)
-
+    
     return jsonify({"message": "Event added successfully"}), 200
 
 
@@ -159,10 +159,10 @@ def edit_event(event_id):
     """PUT request to edit an event by ID"""
     data = request.json
     updated_event = {
-        "Amount": float(data.get("Amount")),
-        "Category": data.get("Category"),
-        "Date": data.get("Date"),
-        "Memo": data.get("Memo"),
+        "Amount": float(data.get("amount")),
+        "Category": data.get("category"),
+        "Date": data.get("date"),
+        "Memo": data.get("memo"),
     }
 
     current_user.edit_event(db, event_id, updated_event)
