@@ -1,5 +1,5 @@
 # FisCal: Budget tracker calendar with fiscal analysis
-[![Web App CI](https://github.com/software-students-fall2024/5-final-theonepiece/actions/workflows/web-app.yml/badge.svg)](https://github.com/software-students-fall2024/4-containers-financiers/actions/workflows/web-app.yml)
+[![Web App CI](https://github.com/software-students-fall2024/5-final-theonepiece/actions/workflows/CI.yml/badge.svg)](https://github.com/software-students-fall2024/4-containers-financiers/actions/workflows/web-app.yml)
 ## Description
 FisCal is a budget-tracking calendar app that helps users manage their personal spending. Users can manually input expenses by adding events to a calendar, specifying the date, time, title (e.g., what they spent money on), and the amount spent. The app aggregates data to display daily, weekly, and monthly spending summaries and employs AI to analyze spending habits and provide personalized advice.
 
