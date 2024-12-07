@@ -45,7 +45,6 @@ FisCal is a budget-tracking calendar app that helps users manage their personal 
                 |       (Automated)         |
                 +---------------------------+
 
-```
 
 ## Folder Structure
 ```
@@ -85,6 +84,7 @@ FisCal is a budget-tracking calendar app that helps users manage their personal 
   - LICENSE
   - pyproject.toml
   - README.md
+```
 
 
 
@@ -110,6 +110,8 @@ docker-compose up
 4. Access the Web App.
 
  You should be able to locally access web-app running on http://127.0.0.1:5000/
+
+5. Sign up using by inputting your custom info and proceed to log in and use the app
   
 
 ## Thank you!
