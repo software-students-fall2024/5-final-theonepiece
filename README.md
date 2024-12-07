@@ -86,7 +86,7 @@ FisCal is a budget-tracking calendar app that helps users manage their personal 
   - pyproject.toml
   - README.md
 
-```
+
 
 ## Setup Instructions
 
