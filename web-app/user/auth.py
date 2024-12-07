@@ -3,7 +3,7 @@ from flask_login import LoginManager, login_user, logout_user, login_required
 from user.models import User
 from pymongo import MongoClient
 
-client = MongoClient("mongodb://localhost:27017/")
+client = MongoClient("mongodb://mongodb:27017/")
 db = client["fiscal_db"]
 
 auth = Blueprint("auth", __name__)
