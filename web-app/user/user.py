@@ -175,10 +175,26 @@ def edit_event(event_id):
 def get_events():
     """GET route return all events of user as JSON based on date"""
     filter_date = request.args.get("date")  # format: YYYY-MM-DD
+
     events = current_user.get_events(db)
     if filter_date:
         events = [e for e in events if e["Date"] == filter_date]
+        
     return jsonify(events), 200
+
+@user.route("/search-events/<word>", methods=["GET"])
+@login_required
+def search_events(word):
+    """GET route return all events of user as JSON based on date"""
+    if(not word):
+        word=""
+        
+    events = current_user.get_events(db) or []
+    print()
+    events_category_memo = [e for e in events if (e["Category"] and word.lower() in e["Category"].lower()) or (e["Memo"] and word.lower() in e["Memo"].lower())]
+    
+    return render_template("Search.html",searchVal=word,events=events_category_memo)
+        
 
 
 @user.route("/analytics-data", methods=["GET"])
