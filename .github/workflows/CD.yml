@@ -38,4 +38,4 @@ jobs:
     - name: Build and Push Web App Image
       run: |
         docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:latest ./web-app
-        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:latest
+        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:web-app-latest
