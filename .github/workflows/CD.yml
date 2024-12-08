@@ -41,7 +41,7 @@ jobs:
     - name: Build and Push Web App Image
       run: |
         # Build the web-app service using docker-compose
-        docker-compose build web-app
+        docker compose build web-app
         # Tag the web-app image for your repository
         docker tag theonepiece-web-app:latest ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:web-app-latest
         # Push the web-app image to Docker Hub
