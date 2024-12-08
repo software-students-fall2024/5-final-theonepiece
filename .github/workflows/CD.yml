@@ -1,22 +1,12 @@
-name: Continuous Deployment Workflow
+name: Continuous Deployment to Docker Hub
 
 on:
   push:
     branches:
       - main
-    paths:
-      - 'web-app/**'
-      - '.github/workflows/CD.yml'
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'web-app/**'
-      - '.github/workflows/CD.yml'
-
 
 jobs:
-  delivery:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
@@ -29,17 +19,20 @@ jobs:
         username: ${{ secrets.DOCKER_HUB_USERNAME }}
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-    - name: Run Docker Compose
+    - name: Pull and Push MongoDB Image
       run: |
-        docker compose down
-        docker compose build
-
-    - name: Push MongoDB image
-      run: |
+        # Pull the official MongoDB image
+        docker pull mongo:latest
+        # Tag the MongoDB image for your repository
         docker tag mongo:latest ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:mongo-latest
+        # Push the MongoDB image to Docker Hub
         docker push ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:mongo-latest
 
-    - name: Push Web App image
+    - name: Build and Push Web App Image
       run: |
-        docker tag 5-final-theonepiece-web-app:latest ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:web-app-latest
+        # Build the web-app service using docker-compose
+        docker-compose build web-app
+        # Tag the web-app image for your repository
+        docker tag theonepiece-web-app:latest ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:web-app-latest
+        # Push the web-app image to Docker Hub
         docker push ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:web-app-latest
