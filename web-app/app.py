@@ -25,6 +25,8 @@ Blueprints:
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask import Flask, render_template, request, redirect, url_for
 from flask_login import current_user, login_required, logout_user
+from flask import Flask, render_template, request, redirect, url_for, flash
+from flask_login import current_user, login_required,logout_user
 from database import db
 from user.user import user, login_manager
 
@@ -70,6 +72,7 @@ if __name__ == "__main__":
 def index():
     """Redirect to right page if logged in or not"""
     if current_user.is_authenticated:
+        return render_template("Calendar.html")
         return render_template("Calendar.html")
     return redirect(url_for("user.login"))
 
