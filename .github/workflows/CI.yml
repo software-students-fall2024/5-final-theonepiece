@@ -6,13 +6,13 @@ on:
       - main
     paths:
       - 'web-app/**'
-      - '.github/workflows/web-app.yml'
+      - '.github/workflows/CI.yml'
   pull_request:
     branches:
       - main
     paths:
       - 'web-app/**'
-      - '.github/workflows/web-app.yml'
+      - '.github/workflows/CI.yml'
 
 jobs:
   test-and-build:
