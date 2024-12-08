@@ -241,7 +241,7 @@ def ai_analysis():
         user_events = current_user.get_events(db)
         
         if not user_events:
-            return jsonify({"analysis": "No events found. Add some events to get analysis."}), 200
+            return jsonify({"analysis": "No events found. Add some events to your calendar to get analysis."}), 200
         
         # format events into a string for the AI
         events_summary = "\n".join(
@@ -263,9 +263,7 @@ def ai_analysis():
 
         return jsonify({"analysis": response.text}), 200
     except Exception as e:
-        print(f"Error: {e}")
-        return jsonify({"error": "Unable to analyze data"}), 500
-
+        return jsonify({"error": "Unable to analyze data", "details": str(e)}), 500
 
 
 @user.route("/login", methods=["GET", "POST"])
