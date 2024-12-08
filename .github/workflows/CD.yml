@@ -29,36 +29,17 @@ jobs:
         username: ${{ secrets.DOCKER_HUB_USERNAME }}
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-    - name: Build and push MongoDB image
-      run: |
-        docker pull mongo:latest
-        docker tag mongo:latest ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:mongo-latest
-        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:mongo-latest
-
-    - name: Build and push Web App image
+    - name: Run Docker Compose
       run: |
         docker compose down
         docker compose build
-        docker compose up
+
+    - name: Push MongoDB image
+      run: |
+        docker tag mongo:latest ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:mongo-latest
+        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:mongo-latest
+
+    - name: Push Web App image
+      run: |
         docker tag 5-final-theonepiece-web-app:latest ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:web-app-latest
         docker push ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:web-app-latest
-
-  deploy:
-    needs: delivery
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Deploy to Digital Ocean
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.SERVER_IP }}
-        username: ${{ secrets.SERVER_USER }}
-        key: ${{ secrets.SERVER_KEY }}
-        script: |
-          cd /path/to/your/app
-          docker-compose down
-          docker-compose pull
-          docker-compose up --build -d
