@@ -1,4 +1,4 @@
-name: CI/CD
+name: CI/CD Pipeline
 
 on:
   push:
@@ -15,7 +15,8 @@ on:
       - '.github/workflows/CI-CD.yml'
 
 jobs:
-  test-and-build:
+  test:
+    name: Run Tests
     runs-on: ubuntu-latest
 
     services:
@@ -43,37 +44,32 @@ jobs:
         env:
           MONGO_CXN_STRING: mongodb://localhost:27017/
         run: |
-          # Activate pipenv shell and run tests from the root directory
           cd web-app
           pipenv run pytest ../web-app/test_app.py --cov=../web-app --cov-report=xml
           pipenv run coverage report -m
 
-      - name: Build Docker image
-        run: |
-          docker build -t web-app \
-            --build-arg MONGO_CXN_STRING=mongodb://localhost:27017/ \
-            ./web-app
-
   build-and-push:
+    name: Build and Push Docker Images
     runs-on: ubuntu-latest
+    needs: test
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v1
-      with:
-        username: ${{ secrets.DOCKER_HUB_USERNAME }}
-        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-    - name: Pull and Push MongoDB Image
-      run: |
-        docker pull mongo:latest
-        docker tag mongo:latest ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:mongo-latest
-        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:mongo-latest
+      - name: Build and Push MongoDB Image
+        run: |
+          docker pull mongo:latest
+          docker tag mongo:latest ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:mongo-latest
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:mongo-latest
 
-    - name: Build and Push Web App Image
-      run: |
-        docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:web-app-latest ./web-app
-        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:web-app-latest
+      - name: Build and Push Web App Image
+        run: |
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:web-app-latest ./web-app
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:web-app-latest
