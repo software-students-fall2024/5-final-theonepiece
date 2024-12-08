@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "Base.html" %}
 {% block title %}
 Edit User Info
 {% endblock %}
@@ -31,7 +31,7 @@ Edit User Info
             color: #3c6e71;
         }
         .signup-container input {
-            width: 90%;
+            width: 100%;
             background-color: #f0f0f0;
             padding: 10px;
             margin-bottom: 10px;
@@ -42,6 +42,12 @@ Edit User Info
         }
         .signup-container input::placeholder {
             color: #6e6e6e;
+        }
+        .signup-container form {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
         .email-input {
             cursor: not-allowed;
@@ -54,9 +60,10 @@ Edit User Info
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            width: 100%;
+            width: 90%;
             font-size: 16px;
             transition: background-color 0.3s ease;
+            margin-top: 1rem;
         }
         .signup-btn:hover {
             background-color: #2b5a5e;
@@ -69,7 +76,7 @@ Edit User Info
             padding: 10px 15px;
             border-radius: 5px;
             cursor: pointer;
-            width: 100%;
+            width: 90%;
             font-size: 16px;
             margin-top: 10px;
             transition: all 0.3s ease;
@@ -87,6 +94,7 @@ Edit User Info
             border-radius: 5px;
             cursor: pointer;
             width: 100%;
+            text-decoration: none;
             font-size: 16px;
             margin-top: 20px;
             transition: background-color 0.3s ease;
@@ -118,9 +126,8 @@ Edit User Info
         <input type="text" id="firstname" name="firstname" placeholder="First Name" value={{user_info.firstname}} required>
         <input type="text" id="lastname" name="lastname" placeholder="Last Name" value={{user_info.lastname}} required>
         <button type="submit" class="signup-btn">Update Info</button>
+        <!--<button onclick="goBack()" class="back-btn">Cancel</button>-->
     </form>
-
-    <button onclick="goBack()" class="back-btn">Cancel</button>
 
     <h2 id="danger-zone">Danger Zone</h2>
     <a href="/delete-acct" class="delete-btn">Delete Account</a>
