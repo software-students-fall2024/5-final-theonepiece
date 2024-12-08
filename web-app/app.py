@@ -25,6 +25,7 @@ def index():
     """Redirect to right page if logged in or not"""
     if current_user.is_authenticated:
         return render_template("Calendar.html")
+        return render_template("Calendar.html")
     return redirect(url_for("user.login"))
 
 
@@ -90,12 +91,11 @@ def user_info():
 def delete_acct():
     return render_template("delete-acct.html")
 
-@app.route("/logout")
-@login_required
+@app.route('/logout')
 def logout():
-    logout_user()
-    flash("Logged out successfully!", "success")
-    return redirect(url_for("index"))
+    """Log out the user and redirect to the login page"""
+    logout_user()  # This function logs out the current user
+    return redirect(url_for('user.login'))  # Redirect to the login page
 
 
 
