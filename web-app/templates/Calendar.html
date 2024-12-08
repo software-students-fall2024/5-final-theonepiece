@@ -226,6 +226,9 @@ Calendar
             padding: 0.2rem 0.5rem;
             border-radius: 1rem;
         }
+        .category {
+            min-width: 35%;
+        }
     </style>
 {% endblock %}
 {% block content %}
@@ -446,7 +449,7 @@ Calendar
                 currEvents.forEach((el,ind)=>{
                     console.log(typeof el._id)
                     const newDivHTML = `<div id='${el._id}' class="expense-item ${ind%2===0 ? 'odd' : ''}">
-                        <span>${el.Category}</span>
+                        <span class="category">${el.Category}</span>
                         <span>${el.Memo}</span>
                         <span>-$${el.Amount}</span>
                         <div class="expense-item-buttons">
@@ -528,7 +531,7 @@ Calendar
 
         }
         function cancelEdit(id,amount,memo,category){
-            document.getElementById(id).innerHTML = `<span>${category}</span>
+            document.getElementById(id).innerHTML = `<span class="category">${category}</span>
                         <span>${memo}</span>
                         <span>-$${amount}</span>
                         <div class="expense-item-buttons">
