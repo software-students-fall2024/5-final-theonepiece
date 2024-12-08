@@ -8,8 +8,10 @@ on:
 jobs:
   delivery:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
     - name: Log in to Docker Hub
       uses: docker/login-action@v1
@@ -17,14 +19,22 @@ jobs:
         username: ${{ secrets.DOCKER_HUB_USERNAME }}
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-    - name: Build and push Docker image
+    - name: Build and push MongoDB image
       run: |
-        docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:latest ./web-app
-        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:latest
+        docker pull mongo:latest
+        docker tag mongo:latest ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:mongo-latest
+        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:mongo-latest
+
+    - name: Build and push Web App image
+      run: |
+        docker-compose build
+        docker tag 5-final-theonepiece-web-app:latest ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:web-app-latest
+        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:web-app-latest
 
   deploy:
     needs: delivery
     runs-on: ubuntu-latest
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
