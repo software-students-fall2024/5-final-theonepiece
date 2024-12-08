@@ -134,7 +134,7 @@ def add_event():
 
     event = {
         "_id": str(ObjectId()),
-        "Amount": amount, #float(amount) xxxx
+        "Amount": float(amount),
         "Category": category,
         "Date": date,
         "Memo": memo,
