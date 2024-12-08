@@ -40,7 +40,7 @@ Analytics
         .search-bar a{
             text-decoration: none;
             color: white;
-            background-color:#c9404c;;
+            background-color:#c9404c;
             border-radius: 50%;
             padding:0.5rem 0.9rem;
             font-weight:bold;
@@ -117,22 +117,20 @@ Analytics
             <a class="x-btn" href="/search">&#10005;</a>
         </div>
 
-        {% set searchVal="dd"%}
-        {% set search_list=[{"name":"asdfsdfasdfasda", "category":"asdfasfasdfb","amount":"79","date":"2024-12-03"},{"name":"a", "category":"b","amount":"79","date":"2024-12-03"},{"name":"a", "category":"b","amount":"79","date":"2024-12-03"},]%}
         {% if searchVal %}
             <table class="expense-summary">
                 <tr class="expense-item">
+                    <th>Date</th>
                     <th>Category</th>
                     <th>Memo</th>
                     <th>Amount</th>
-                    <th>Date</th>
                 </tr>
-                {% for expense in search_list %}
+                {% for expense in events %}
                 <tr class="expense-item {% if loop.index%2 == 1 %}odd{% endif %}">
-                    <td>{{expense.name}}</td>
-                    <td>{{expense.category}}</td>
-                    <td>-${{expense.amount}}</td>
-                    <td>{{expense.date}}</td>
+                    <td>{{expense.Date}}</td>
+                    <td>{{expense.Category}}</td>
+                    <td>{{expense.Memo}}</td>
+                    <td>-${{expense.Amount}}</td>
                     <!--<td class="buttons">
 
                         <button class="delete-button" onclick="deleteWord('{{ expense.name }}')">x</button>
@@ -154,7 +152,7 @@ Analytics
         async function search(){
             const inputElement = document.getElementById('search-word');
             const inputValue = inputElement.value;
-            window.location.href = `/vocab/${encodeURIComponent(inputValue)}`;
+            window.location.href = `/user/search-events/${encodeURIComponent(inputValue)}`;
         }
     </script>
 {% endblock %}

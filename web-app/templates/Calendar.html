@@ -119,6 +119,17 @@ Calendar
             color:white;
             padding: 1.5rem 0.5rem;
         }
+        .expense-item .expense-item-buttons button{
+            background:none;
+            font-size: 1.3rem;
+        }
+        .expense-item .expense-item-buttons button.edit{
+            color:white;
+        }
+        .expense-item .expense-item-buttons button.delete{
+            color:#c9404c;
+            margin-left:0.3rem;
+        }
 
         .expense-item.odd {
             background-color: rgba(255,255,255,0.1)
@@ -190,13 +201,41 @@ Calendar
         #add-event b{
             font-size: 2rem;
         }
+
+        .edit-form{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.2rem;
+        }
+
+        .edit-form input, select{
+            width: 100%;
+            padding: 0.3rem;
+            border-radius: 1.3rem;
+        }
+        .edit-form select{
+            background-color:#fca311;
+        }
+        .edit-form .buttons{
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+        .edit-form .buttons button{
+            padding: 0.2rem 0.5rem;
+            border-radius: 1rem;
+        }
+        .category {
+            min-width: 35%;
+        }
     </style>
 {% endblock %}
 {% block content %}
     <div class="calendar-container">
         <div class="calendar">
             <div class="calendar-header">
-                <h2 id="selected-date">2</h2>
+                <h2 id="selected-date"></h2>
                 <div class="month-nav">
                     <button class="navigation" onclick="prevMonth()">&#9664;</button>
                     <p id="selected-year-month"></p>
@@ -205,7 +244,7 @@ Calendar
             </div>
             <div class="calendar-grid days">
                 <!-- Calendar days -->
-                {% set weekdays = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] %} 
+                {% set weekdays = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] %} 
                 {% for day in weekdays %}
                     <div class="weekday">
                         {{ day }}
@@ -218,27 +257,29 @@ Calendar
         <div class="calendar-shadow-1"></div>
         <div class="calendar-shadow-2"></div>
         <div class="expense-summary">
-            <h3 class="expense-item" id="selected-month-date"></h3>
-            {% set expenses = [{"category": 'Transportation', "expense": 79.50},{"category": 'Transportation', "expense": 79.50},{"category": 'Transportation', "expense": 79.50}] %} 
-            {% for expense in expenses %}
-                <div class="expense-item {% if loop.index%2 == 1 %}odd{% endif %}">
-                    <span>{{expense.category}}</span>
-                    <span>-${{expense.expense}}</span>
+            {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                <div class="flash-message {{ messages[0][0] }}">
+                    {{ messages[0][1] }}
                 </div>
-            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <h3 class="expense-item" id="selected-month-date"></h3>
+            <div id="expense-list"></div>
 
             <form id="expense-form" onsubmit="addExpense(event)">
-                <select name="pets" id="pet-select">
-                    <option value="food">Food</option>
-                    <option value="rent">Rent</option>
-                    <option value="phone">Phone</option>
-                    <option value="transportation">Transportation</option>
-                    <option value="education">Education</option>
-                    <option value="entertainment">Entertainment</option>
+                <select name="category" id="pet-select">
+                    <option value="Food">Food</option>
+                    <option value="Rent">Rent</option>
+                    <option value="Phone">Phone</option>
+                    <option value="Transportation">Transportation</option>
+                    <option value="Education">Education</option>
+                    <option value="Entertainment">Entertainment</option>
                 </select>
                   
-                <input type="text" id="Amount" placeholder="Amount" required>
-                <input type="text" id="Memo" placeholder="Memo" >
+                <input type="text" id="Amount" name="amount" placeholder="Amount" required>
+                <input type="text" id="Memo" name="memo" placeholder="Memo" >
                 <div class="buttons">
                     <button type="submit" class="submit">Add</button>
                     <button class="cancel" onclick="cancel()">Cancel</button>
@@ -251,14 +292,50 @@ Calendar
         </div>
     </div>
     <script>
-        const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+        let events = null;
+        let totalDic = null;
+
+        const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat',];
         const months=["January","February","March","April","May","June","July","August","September","October","November","December"]
         let currentDate = new Date();
         let [year, month, date, day] = [currentDate.getFullYear(), currentDate.getMonth()+1,currentDate.getDate(),currentDate.getDay()]
+        
+        async function runTasks() {
+            loadCalendar();
+            await fetchEvents();
+            updateElements();
+            loadCalendar();
+            loadDailyExpenses();
+        }
+        runTasks();
 
-        updateElements();
-        loadCalendar();
 
+        async function fetchEvents(filterDate = null) {
+            try {
+                let url = "/user/get-events";
+                if (filterDate) {
+                    url += `?date=${filterDate}`;
+                }
+
+                const response = await fetch(url, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                events = await response.json();
+                updateTotals();
+                console.log("Events data:", events, totalDic);
+
+            } catch (error) {
+                console.error("Error fetching events:", error);
+            }
+        }
 
 
         const clickNewEvent = ()=>{
@@ -322,7 +399,10 @@ Calendar
                 else end=28
             }
             else if([1,3,5,7,8,10,12].includes(month)) end=31
-            for(let i=0;i<(day+1)%7;i++){
+
+            const firstDay = new Date(`${year}-${month}-1`);
+            console.log(firstDay.getDay())
+            for(let i=0;i<(firstDay.getDay())%7;i++){
                 const newDivHTML = `<div class="calendar-day">
                 </div>`;
                 calendarGrid.insertAdjacentHTML('beforeend', newDivHTML);
@@ -330,7 +410,7 @@ Calendar
             for(let i=1;i<=end;i++){
                 const newDivHTML = `<div class="calendar-day" id=${i === date ? 'selected' : ''}>
                                         <p>${i}</p>
-                                        <p class="expense">-$120.78</p>
+                                        ${totalDic && totalDic[`${year}-${month}-${i}`]!=undefined ? `<p class="expense">-$${totalDic[`${year}-${month}-${i}`]}</p>` : ` <p class="expense">&nbsp;</p> `}
                                     </div>`;
                 calendarGrid.insertAdjacentHTML('beforeend', newDivHTML);
                 const newDiv = calendarGrid.lastElementChild; // Get the last inserted element
@@ -341,12 +421,206 @@ Calendar
                     } 
                     newDiv.setAttribute('id','selected');
                     updateDate(i);
+                    loadDailyExpenses(i);
                 });
             }
+
+        }
+        async function loadDailyExpenses(currDate = date) {
+            try {
+                let url = "/user/get-events";
+                url += `?date=${year}-${month}-${currDate}`;
+
+                const response = await fetch(url, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                let currEvents = await response.json();
+                console.log(currEvents+'adsfas')
+                const expenseList = document.getElementById('expense-list');
+                expenseList.innerHTML = '';
+                currEvents.forEach((el,ind)=>{
+                    console.log(typeof el._id)
+                    const newDivHTML = `<div id='${el._id}' class="expense-item ${ind%2===0 ? 'odd' : ''}">
+                        <span class="category">${el.Category}</span>
+                        <span>${el.Memo}</span>
+                        <span>-$${el.Amount}</span>
+                        <div class="expense-item-buttons">
+                            <button class="edit" onclick="editUI('${el._id}','${el.Amount}','${el.Memo}','${el.Category}')">&#10000;</button>
+                            <button class="delete" onclick="deleteEvent('${el._id}',${el.Amount})">&#10005;</button>
+                        </div>
+                    </div>`;
+            
+                    expenseList.insertAdjacentHTML('beforeend', newDivHTML);
+
+                })
+
+
+                console.log("Events data:", events);
+
+            } catch (error) {
+                console.error("Error fetching events:", error);
+            }
+            
+
 
         }
         function isLeapYear(year) {
             return (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0));
         }
+
+        function updateTotals(mode=null,amount=null) {
+            if(events){
+                if(!mode){
+                    totalDic = {};
+                    events.forEach((el,ind,arr)=>{
+                        if(!totalDic[el.Date]) totalDic[el.Date] = el.Amount;
+                        else totalDic[el.Date] += el.Amount;
+                    })
+                }
+                else if(mode==='add'){
+                    totalDic[`${year}-${month}-${date}`]=(totalDic[`${year}-${month}-${date}`] || 0)+amount;
+                }
+                else if(mode==='delete'){
+                    totalDic[`${year}-${month}-${date}`]-=amount;
+                }
+            }
+        }
+
+        function addExpense(event) {
+            event.preventDefault(); // Prevent the default form submission behavior
+
+            const form = event.target;
+            const formData = new FormData(form);
+            const payload = Object.fromEntries(formData.entries());
+            payload.date = `${year}-${month}-${date}`;
+
+            if(isNaN(parseFloat(formData.get('amount')))){
+                alert("Please enter a valid number for the amount.");
+                return;
+            }
+        
+
+            fetch("/user/add-event", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error("Failed to add expense. Please try again.");
+                    }
+                    form.reset();
+                    loadDailyExpenses();
+                    updateTotals('add',parseFloat(formData.get('amount')));
+                    loadCalendar();
+                })
+                .catch((error) => {
+                    console.error("Error adding expense:", error);
+                    alert("Failed to add expense. Please check your input and try again.");
+                });
+
+        }
+        function cancelEdit(id,amount,memo,category){
+            document.getElementById(id).innerHTML = `<span class="category">${category}</span>
+                        <span>${memo}</span>
+                        <span>-$${amount}</span>
+                        <div class="expense-item-buttons">
+                            <button class="edit" onclick="editUI('${id}','${amount}','${memo}','${category}')">&#10000;</button>
+                            <button class="delete" onclick="deleteEvent('${id}',${amount})">&#10005;</button>
+                        </div>`;
+
+        }
+
+        function editUI(id,amount,memo,category){
+            console.log(category)
+            document.getElementById(id).innerHTML = `<form class="edit-form" onsubmit="editExpense(event,'${id}','${amount}')">
+                        <select name="category" id="pet-select" >
+                            <option value="Food" ${category === "Food" ? "selected" : ""}>Food</option>
+                            <option value="Rent" ${category === "Rent" ? "selected" : ""}>Rent</option>
+                            <option value="Phone" ${category === "Phone" ? "selected" : ""}>Phone</option>
+                            <option value="Transportation" ${category === "Transportation" ? "selected" : ""}>Transportation</option>
+                            <option value="Education" ${category === "Education" ? "selected" : ""}>Education</option>
+                            <option value="Entertainment" ${category === "Entertainment" ? "selected" : ""}>Entertainment</option>
+                        </select>
+                        
+                        <input type="text" id="Amount" name="amount" placeholder="Amount" value="${amount}" required>
+                        <input type="text" id="Memo" name="memo" value="${memo}" placeholder="Memo" >
+                        <div class="buttons">
+                            <button type="submit" class="submit">Apply</button>
+                            <button class="cancel" onclick="cancelEdit('${id}','${amount}','${memo}','${category}')">Cancel</button>
+                        </div>
+                    </form>`;
+        }
+        function editExpense(event,id,amount) {
+            event.preventDefault();
+
+            const form = event.target;
+            const formData = new FormData(form);
+            const payload = Object.fromEntries(formData.entries());
+            payload.date = `${year}-${month}-${date}`;
+
+            if(isNaN(parseFloat(formData.get('amount')))){
+                alert("Please enter a valid number for the amount.");
+                return;
+            }
+        
+
+            fetch(`/user/edit-event/${id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error("Failed to edit expense. Please try again.");
+                    }
+                    form.reset();
+                    loadDailyExpenses();
+                    updateTotals('add',parseFloat(formData.get('amount'))-parseFloat(amount));
+                    loadCalendar();
+                })
+                .catch((error) => {
+                    console.error("Error adding expense:", error);
+                    alert("Failed to add expense. Please check your input and try again.");
+                });
+
+        }
+
+        function deleteEvent(id,amount) {
+            fetch(`/user/delete-event/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Failed to add expense. Please try again.");
+                }
+
+                loadDailyExpenses();
+                updateTotals('delete',amount);
+                loadCalendar();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+
+        }
+
+        
     </script>
 {% endblock %}

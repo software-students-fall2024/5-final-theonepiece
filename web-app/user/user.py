@@ -127,10 +127,10 @@ DEFAULT_CATEGORIES = [
 def add_event():
     """POST request accept JSON payload to add event"""
     data = request.json
-    amount = data.get("Amount")
-    category = data.get("Category")
-    date = data.get("Date")
-    memo = data.get("Memo")
+    amount = data.get("amount")
+    category = data.get("category")
+    date = data.get("date")
+    memo = data.get("memo")
 
     event = {
         "_id": str(ObjectId()),
@@ -141,7 +141,7 @@ def add_event():
     }
 
     current_user.add_event(db, event)
-
+    
     return jsonify({"message": "Event added successfully"}), 200
 
 
@@ -159,10 +159,10 @@ def edit_event(event_id):
     """PUT request to edit an event by ID"""
     data = request.json
     updated_event = {
-        "Amount": float(data.get("Amount")),
-        "Category": data.get("Category"),
-        "Date": data.get("Date"),
-        "Memo": data.get("Memo"),
+        "Amount": float(data.get("amount")),
+        "Category": data.get("category"),
+        "Date": data.get("date"),
+        "Memo": data.get("memo"),
     }
 
     current_user.edit_event(db, event_id, updated_event)
@@ -175,10 +175,26 @@ def edit_event(event_id):
 def get_events():
     """GET route return all events of user as JSON based on date"""
     filter_date = request.args.get("date")  # format: YYYY-MM-DD
+
     events = current_user.get_events(db)
     if filter_date:
         events = [e for e in events if e["Date"] == filter_date]
+        
     return jsonify(events), 200
+
+@user.route("/search-events/<word>", methods=["GET"])
+@login_required
+def search_events(word):
+    """GET route return all events of user as JSON based on date"""
+    if(not word):
+        word=""
+        
+    events = current_user.get_events(db) or []
+    print()
+    events_category_memo = [e for e in events if (e["Category"] and word.lower() in e["Category"].lower()) or (e["Memo"] and word.lower() in e["Memo"].lower())]
+    
+    return render_template("Search.html",searchVal=word,events=events_category_memo)
+        
 
 
 @user.route("/analytics-data", methods=["GET"])

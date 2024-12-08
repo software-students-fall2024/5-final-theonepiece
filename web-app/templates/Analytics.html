@@ -116,6 +116,7 @@ Analytics
 
                 const analyticsResponse = await fetch("/user/analytics-data");
                 groupedAnalyticsData = await analyticsResponse.json();
+                console.log(groupedAnalyticsData)
             } catch (error) {
                 console.error("Error fetching data:", error);
                 return;
@@ -170,12 +171,10 @@ Analytics
                 totalExpenses += monthTotal;
 
                 // transactions grouped by month + year title
+                const months = ["January","February","March","April","May","June","July","August","September","October","November","December"]
                 const monthTitle = document.createElement("h3");
                 monthTitle.classList.add("expense-item");
-                monthTitle.textContent = new Date(`${monthYear}-01`).toLocaleString("default", {
-                    month: "long",
-                    year: "numeric",
-                });
+                monthTitle.textContent = `${months[monthYear.split("-")[1]-1]} ${monthYear.split("-")[0]}`;
                 expenseSummary.appendChild(monthTitle);
 
                 // expeneses for the month
