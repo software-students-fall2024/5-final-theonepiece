@@ -1,28 +1,27 @@
-version: "3.9"  # Specifies the Docker Compose file format version
-
 services:
   # MongoDB service configuration
   mongodb:
-    image: mongo  # Specifies the official MongoDB Docker image
-    container_name: mongodb  # Assigns a custom name to the container
+    image: mongo # Specifies the official MongoDB Docker image
+    container_name: mongodb # Assigns a custom name to the container
     ports:
-      - "27017:27017"  # Maps MongoDB's default port to the host
+      - "27017:27017" # Maps MongoDB's default port to the host
     networks:
-      - app-network  # Connects this service to the shared network
+      - app-network # Connects this service to the shared network
 
   # Web application service configuration
   web-app:
-    build: ./web-app  # Builds the Flask app from the specified directory
-    container_name: theonepiece-web-app  # Assigns a custom name to the container
+    build: ./web-app # Builds the Flask app from the specified directory
+    container_name: theonepiece-web-app # Assigns a custom name to the container
     depends_on:
-      - mongodb  # Ensures MongoDB starts before this service
+      - mongodb # Ensures MongoDB starts before this service
     networks:
-      - app-network  # Connects this service to the shared network
+      - app-network # Connects this service to the shared network
     environment:
-      - MONGO_URI=mongodb://mongodb:27017/theonepiece  # MongoDB connection URI for the Flask app
+      - MONGO_URI=mongodb://mongodb:27017/theonepiece # MongoDB connection URI for the Flask app
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
     ports:
-      - "5000:5000"  # Expose the Flask app to the host
-    command: python app.py  # Command to run the Flask app
+      - "5000:5000" # Expose the Flask app to the host
+    command: python app.py # Command to run the Flask app
     develop:
       watch:
         - action: sync
@@ -32,4 +31,4 @@ services:
 # Network configuration
 networks:
   app-network:
-    driver: bridge  # Creates an isolated bridge network for inter-container communication
+    driver: bridge # Creates an isolated bridge network for inter-container communication

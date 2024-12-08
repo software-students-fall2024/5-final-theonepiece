@@ -236,9 +236,13 @@ def analytics_data():
 @login_required
 def ai_analysis():
     """Generate AI insights based on user's events."""
+
     try:
         user_events = current_user.get_events(db)
-
+        
+        if not user_events:
+            return jsonify({"analysis": "No events found. Add some events to get analysis."}), 200
+        
         # format events into a string for the AI
         events_summary = "\n".join(
             [f"- {event['Category']}: ${event['Amount']} on {event['Date']} ({event['Memo']})"
@@ -253,7 +257,7 @@ def ai_analysis():
             f"Provide budget-saving tips based on these user events provided in JSON format. Be as concise as possible:\n\n{events_summary}"
         )
 
-        # generate AI content
+        # generate AI response
         model = genai.GenerativeModel(model_name="gemini-1.5-pro")
         response = model.generate_content(prompt)
 
