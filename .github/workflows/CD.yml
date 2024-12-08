@@ -37,7 +37,9 @@ jobs:
 
     - name: Build and push Web App image
       run: |
-        docker-compose build
+        docker compose down
+        docker compose build
+        docker compose up
         docker tag 5-final-theonepiece-web-app:latest ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:web-app-latest
         docker push ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:web-app-latest
 
