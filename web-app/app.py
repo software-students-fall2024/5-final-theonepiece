@@ -76,6 +76,12 @@ def search():
     """Render Search page"""
     return render_template("Search.html")
 
+@app.route("/ai")
+@login_required
+def ai():
+    """Render Analyze with AI page"""
+    return render_template("Ai.html")
+
 " Route for user info page "
 " Contains First Name, Last Name, and Email"
 @app.route("/user-info", methods=["GET", "POST"])
