@@ -1,0 +1,106 @@
+{% extends "Base.html" %}
+{% block title %}
+Analyze with AI
+{% endblock %}
+{% block styles %}
+    {{ super() }}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #3c6e71;
+            color: white;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .ai-container {
+            background-color: white;
+            color: #3c6e71;
+            max-width: 90vw;
+            width: 400px;
+            padding: 20px;
+            border-radius: 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        .ai-container h2 {
+            margin-bottom: 20px;
+            font-size: 2rem;
+            color: #3c6e71;
+        }
+        .ai-container h3 {
+            margin: 5px 0 20px;
+            font-size: 1.2rem;
+            color: #5b8a82;
+            font-weight: normal;
+        }
+        .ai-container button {
+            background-color: #3c6e71;
+            color: white;
+            font-weight: bold;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 90%;
+            margin: 10px 0;
+            transition: background-color 0.3s ease;
+        }
+        .ai-container button:hover {
+            background-color: #2b5a5e;
+        }
+        .ai-text-box {
+            background-color: #f0f0f0;
+            color: #3c6e71;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-top: 20px;
+            text-align: left;
+            font-size: 16px;
+            min-height: 100px;
+            overflow-y: auto;
+        }
+        .ai-icon {
+            font-size: 50px;
+            color: #3c6e71;
+            margin-bottom: 20px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="ai-container">
+    <div class="ai-icon">
+        <img src="static/sparkles.svg" alt="empty" />
+    </div>
+    
+    <h2>Budget Advice</h2>
+    <h3>Powered by Google Gemini</h3>
+    <button id="analyze-button" onClick="analyzeWithAI()">Analyze with AI</button>
+    <div id="ai-text" class="ai-text-box">
+        <!-- AI output will appear here -->
+    </div>
+</div>
+
+<script>
+    function analyzeWithAI() {
+        const aiTextBox = document.getElementById('ai-text');
+        aiTextBox.innerText = "Analyzing data... Please wait.";
+
+        fetch('/user/ai-analysis', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                aiTextBox.innerText = data.analysis || "No analysis available.";
+            })
+            .catch(error => {
+                console.error(error);
+                aiTextBox.innerText = "An error occurred while analyzing data.";
+            });
+    }
+</script>
+
+{% endblock %}

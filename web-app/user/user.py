@@ -19,6 +19,9 @@ from flask_login import (
 from flask_bcrypt import Bcrypt
 from database import db
 from bson import ObjectId
+from dotenv import load_dotenv
+import os
+import google.generativeai as genai
 
 user = Blueprint("user", __name__)
 bcrypt = Bcrypt()
@@ -26,6 +29,9 @@ bcrypt = Bcrypt()
 login_manager = LoginManager()
 login_manager.login_view = "user.login"
 
+load_dotenv()
+api_key = os.getenv("GOOGLE_API_KEY")
+genai.configure(api_key=api_key)
 
 class User(UserMixin):
     def __init__(
@@ -226,6 +232,39 @@ def analytics_data():
 
     return jsonify(grouped_data), 200
 
+@user.route("/ai-analysis", methods=["POST"])
+@login_required
+def ai_analysis():
+    """Generate AI insights based on user's events."""
+
+    try:
+        user_events = current_user.get_events(db)
+        
+        if not user_events:
+            return jsonify({"analysis": "No events found. Add some events to your calendar to get analysis."}), 200
+        
+        # format events into a string for the AI
+        events_summary = "\n".join(
+            [f"- {event['Category']}: ${event['Amount']} on {event['Date']} ({event['Memo']})"
+             for event in user_events]
+        )
+
+        prompt = (
+            f"Make sure to reference the specific event or event(s) by their memo or category when specifying tips.\n"
+            f"Do not return any JSON or markdown. Only return plaintext plain-english responses.\n"
+            f"When providing budget-saving tips, make sure to reference how much money they spent in that specific category or event.\n"
+            f"If provided more than 3 events, focus on giving suggestions to save costs on only the most expensive categories.\n"
+            f"Provide budget-saving tips based on these user events provided in JSON format. Be as concise as possible:\n\n{events_summary}"
+        )
+
+        # generate AI response
+        model = genai.GenerativeModel(model_name="gemini-1.5-pro")
+        response = model.generate_content(prompt)
+
+        return jsonify({"analysis": response.text}), 200
+    except Exception as e:
+        return jsonify({"error": "Unable to analyze data", "details": str(e)}), 500
+
 
 @user.route("/login", methods=["GET", "POST"])
 def login():
@@ -235,7 +274,6 @@ def login():
         user = User.validate_login(db, email, password)
         if user:
             login_user(user)
-            # Explicitly point to the main app's index route
             return redirect(url_for("index"))
         else:
             flash("Invalid email or password. Try again.", "error")
