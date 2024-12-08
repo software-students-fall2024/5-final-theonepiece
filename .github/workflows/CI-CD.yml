@@ -1,4 +1,4 @@
-name: Continuous Integration Workflow
+name: CI/CD
 
 on:
   push:
@@ -6,13 +6,13 @@ on:
       - main
     paths:
       - 'web-app/**'
-      - '.github/workflows/CI.yml'
+      - '.github/workflows/CI-CD.yml'
   pull_request:
     branches:
       - main
     paths:
       - 'web-app/**'
-      - '.github/workflows/CI.yml'
+      - '.github/workflows/CI-CD.yml'
 
 jobs:
   test-and-build:
@@ -53,3 +53,27 @@ jobs:
           docker build -t web-app \
             --build-arg MONGO_CXN_STRING=mongodb://localhost:27017/ \
             ./web-app
+
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+    - name: Pull and Push MongoDB Image
+      run: |
+        docker pull mongo:latest
+        docker tag mongo:latest ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:mongo-latest
+        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:mongo-latest
+
+    - name: Build and Push Web App Image
+      run: |
+        docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:web-app-latest ./web-app
+        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:web-app-latest
