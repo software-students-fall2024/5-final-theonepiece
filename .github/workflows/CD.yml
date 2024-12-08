@@ -4,6 +4,16 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'web-app/**'
+      - '.github/workflows/CD.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'web-app/**'
+      - '.github/workflows/CD.yml'
+
 
 jobs:
   build-and-push:
