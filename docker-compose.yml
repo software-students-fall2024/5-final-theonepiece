@@ -1,34 +1,32 @@
-services:
-  # MongoDB service configuration
-  mongodb:
-    image: mongo # Specifies the official MongoDB Docker image
-    container_name: mongodb # Assigns a custom name to the container
-    ports:
-      - "27017:27017" # Maps MongoDB's default port to the host
-    networks:
-      - app-network # Connects this service to the shared network
+version: "3.9"
 
-  # Web application service configuration
-  web-app:
-    build: ./web-app # Builds the Flask app from the specified directory
-    container_name: theonepiece-web-app # Assigns a custom name to the container
-    depends_on:
-      - mongodb # Ensures MongoDB starts before this service
-    networks:
-      - app-network # Connects this service to the shared network
-    environment:
-      - MONGO_URI=mongodb://mongodb:27017/theonepiece # MongoDB connection URI for the Flask app
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
+services:
+  mongodb:
+    image: mongo 
+    container_name: mongodb 
     ports:
-      - "5000:5000" # Expose the Flask app to the host
-    command: python app.py # Command to run the Flask app
+      - "27017:27017"
+    networks:
+      - app-network 
+
+  web-app:
+    build: ./web-app
+    container_name: theonepiece-web-app 
+    depends_on:
+      - mongodb 
+    networks:
+      - app-network 
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/theonepiece 
+    ports:
+      - "5000:5000"
+    command: python app.py
     develop:
       watch:
         - action: sync
           path: ./web-app
           target: /web-app
 
-# Network configuration
 networks:
   app-network:
-    driver: bridge # Creates an isolated bridge network for inter-container communication
+    driver: bridge 
