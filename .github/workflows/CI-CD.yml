@@ -89,6 +89,7 @@ jobs:
           key: ${{ secrets.SERVER_KEY }}
           script: |
             cd /theonepiece
+            git pull
             docker-compose down
             docker-compose pull
             docker-compose up -d
