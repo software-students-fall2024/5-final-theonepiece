@@ -6,6 +6,9 @@ FisCal is a budget-tracking calendar app with AI integration that helps users ma
 ## Deployment
 The app is live and can be accessed at: [http://67.207.91.193:5000/](http://67.207.91.193:5000/)
 
+## Docker Image
+The image for the web-app subsystem is deployed on Docker hub on this [link](https://hub.docker.com/r/aesuran/theonepiece).
+
 ## Team Members
 |Reyhan Abdul Quayum|Rashed Alneyadi|Sia Chen|Chloe Han|
 |:--:|:--:|:--:|:--:|
@@ -23,18 +26,19 @@ git clone https://github.com/software-students-fall2024/5-final-theonepiece.git
 cd 5-final-theonepiece
 ```
 2. If using Docker Desktop application, start Docker Desktop if you haven't already
-3. Build and start the containers with Docker Compose
+3. Add a .env file on the root directory, in the format shown in the example.env file and the actual contents  will be delivered to graders via discord
+4. Build and start the containers with Docker Compose
 ```bash
 docker-compose down
 docker-compose build
 docker-compose up
 ```
 
-4. Access the Web App.
+5. Access the Web App.
 
     You should be able to locally access web-app running on http://127.0.0.1:5000/
 
-5. Sign up using by inputting your custom info and proceed to log in and use the app
+6. Sign up using by inputting your custom info and proceed to log in and use the app
   
 
 ## Thank you!
