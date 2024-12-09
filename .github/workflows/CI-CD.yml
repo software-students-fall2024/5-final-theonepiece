@@ -76,19 +76,19 @@ jobs:
           docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:web-app-latest ./web-app
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/theonepiece:web-app-latest
 
-    deploy:
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Deploy to Digital Ocean Droplet
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_KEY }}
-          script: |
-            cd /var/www/theonepiece
-            docker-compose down
-            docker-compose pull
-            docker-compose up -d
+  deploy:
+  needs: build-and-push
+  runs-on: ubuntu-latest
+  if: github.ref == 'refs/heads/main'
+  steps:
+    - name: Deploy to Digital Ocean Droplet
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_KEY }}
+        script: |
+          cd /var/www/theonepiece
+          docker-compose down
+          docker-compose pull
+          docker-compose up -d
