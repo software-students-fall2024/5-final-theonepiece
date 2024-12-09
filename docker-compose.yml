@@ -17,7 +17,7 @@ services:
     depends_on:
       - mongodb  
     environment:
-      - MONGO_URI=mongodb://root:example@mongodb:27017/theonepiece?authSource=admin
+      - MONGO_URI=mongodb://root:example@mongodb:27017/theonepiece?authSource=admin 
     ports:
       - "5000:5000"
     command: python app.py
