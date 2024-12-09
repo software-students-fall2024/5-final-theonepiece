@@ -2,25 +2,29 @@ version: "3.9"
 
 services:
   mongodb:
-    image: mongo 
-    container_name: mongodb 
+    image: mongo
+    container_name: mongodb
     ports:
       - "27017:27017"
     networks:
-      - app-network 
+      - app-network
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=example
+      - MONGO_INITDB_DATABASE=theonepiece
 
   web-app:
     build: ./web-app
-    container_name: theonepiece-web-app 
+    container_name: theonepiece-web-app
     depends_on:
       - mongodb 
     networks:
-      - app-network 
+      - app-network
     environment:
-      - MONGO_URI=mongodb://mongodb:27017/theonepiece 
+      - MONGO_URI=mongodb://root:example@mongodb:27017/theonepiece?authSource=admin
     ports:
       - "5000:5000"
-    command: python app.py
+    command: gunicorn -w 4 -b 0.0.0.0:5000 app:app
     develop:
       watch:
         - action: sync
@@ -29,4 +33,4 @@ services:
 
 networks:
   app-network:
-    driver: bridge 
+    driver: bridge
