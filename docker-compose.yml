@@ -18,6 +18,7 @@ services:
       - mongodb  
     environment:
       - MONGO_URI=mongodb://root:example@mongodb:27017/theonepiece?authSource=admin 
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
     ports:
       - "5000:5000"
     command: gunicorn -w 4 -b 0.0.0.0:5000 app:app # python app.py for non-gunicorn
