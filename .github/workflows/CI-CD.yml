@@ -88,7 +88,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_KEY }}
           script: |
-            cd /theonepiece
+            cd 5-final-theonepiece/
             git pull
             docker-compose down
             docker-compose pull
