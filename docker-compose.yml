@@ -1,34 +1,23 @@
+version: "3.9"
+
 services:
-  # MongoDB service configuration
   mongodb:
-    image: mongo # Specifies the official MongoDB Docker image
-    container_name: mongodb # Assigns a custom name to the container
+    image: mongo
+    container_name: mongodb
     ports:
-      - "27017:27017" # Maps MongoDB's default port to the host
-    networks:
-      - app-network # Connects this service to the shared network
-
-  # Web application service configuration
-  web-app:
-    build: ./web-app # Builds the Flask app from the specified directory
-    container_name: theonepiece-web-app # Assigns a custom name to the container
-    depends_on:
-      - mongodb # Ensures MongoDB starts before this service
-    networks:
-      - app-network # Connects this service to the shared network
+      - "27017:27017" 
     environment:
-      - MONGO_URI=mongodb://mongodb:27017/theonepiece # MongoDB connection URI for the Flask app
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-    ports:
-      - "5000:5000" # Expose the Flask app to the host
-    command: python app.py # Command to run the Flask app
-    develop:
-      watch:
-        - action: sync
-          path: ./web-app
-          target: /web-app
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=example
+      - MONGO_INITDB_DATABASE=theonepiece
 
-# Network configuration
-networks:
-  app-network:
-    driver: bridge # Creates an isolated bridge network for inter-container communication
+  web-app:
+    build: ./web-app
+    container_name: theonepiece-web-app
+    depends_on:
+      - mongodb  
+    environment:
+      - MONGO_URI=mongodb://root:example@mongodb:27017/theonepiece?authSource=admin 
+    ports:
+      - "5000:5000"
+    command: gunicorn -w 4 -b 0.0.0.0:5000 app:app # python app.py for non-gunicorn

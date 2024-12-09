@@ -13,6 +13,8 @@ pytest-cov = "*"
 pytest = "*"
 google-generativeai = "*"
 python-dotenv = "*"
+gunicorn = "*"
+wfastcgi = "*"
 
 [dev-packages]
 black = "*"
